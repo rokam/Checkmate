@@ -1331,10 +1331,10 @@ const CreateMonitorPage = () => {
 							name="customHeaders"
 							control={control}
 							render={({ field }) => {
-								const headers: HttpHeader[] = field.value ?? [];
+								const customHeaders: HttpHeader[] = field.value ?? [];
 								return (
 									<Stack spacing={theme.spacing(LAYOUT.MD)}>
-										{headers.map((header, index) => (
+										{customHeaders.map((header, index) => (
 											<Stack
 												key={index}
 												direction="row"
@@ -1347,7 +1347,7 @@ const CreateMonitorPage = () => {
 														"pages.createMonitor.form.customHeaders.option.keyPlaceholder"
 													)}
 													onChange={(e) => {
-														const updated = headers.map((h, i) =>
+														const updated = customHeaders.map((h, i) =>
 															i === index ? { ...h, key: e.target.value } : h
 														);
 														field.onChange(updated);
@@ -1360,7 +1360,7 @@ const CreateMonitorPage = () => {
 														"pages.createMonitor.form.customHeaders.option.valuePlaceholder"
 													)}
 													onChange={(e) => {
-														const updated = headers.map((h, i) =>
+														const updated = customHeaders.map((h, i) =>
 															i === index ? { ...h, value: e.target.value } : h
 														);
 														field.onChange(updated);
@@ -1370,7 +1370,7 @@ const CreateMonitorPage = () => {
 												<IconButton
 													size="small"
 													onClick={() => {
-														field.onChange(headers.filter((_, i) => i !== index));
+														field.onChange(customHeaders.filter((_, i) => i !== index));
 													}}
 													aria-label={t(
 														"pages.createMonitor.form.customHeaders.option.removeAriaLabel"
@@ -1385,7 +1385,7 @@ const CreateMonitorPage = () => {
 											color="secondary"
 											startIcon={<Plus size={16} />}
 											onClick={() => {
-												field.onChange([...headers, { key: "", value: "" }]);
+												field.onChange([...customHeaders, { key: "", value: "" }]);
 											}}
 										>
 											{t("pages.createMonitor.form.customHeaders.option.addHeader")}

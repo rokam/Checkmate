@@ -65,7 +65,7 @@ const httpStatusCode = z.number().refine((code) => httpStatusCodeSet.has(code), 
 });
 
 const httpHeaderSchema = z.object({
-	key: z.string(),
+	key: z.string().min(1, "Header name is required"),
 	value: z.string(),
 });
 
