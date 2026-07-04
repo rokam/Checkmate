@@ -64,6 +64,11 @@ const httpStatusCode = z.number().refine((code) => httpStatusCodeSet.has(code), 
 	message: "Must be a valid HTTP status code",
 });
 
+const httpHeaderSchema = z.object({
+	key: z.string(),
+	value: z.string(),
+});
+
 const httpSchema = baseSchema.extend({
 	type: z.literal("http"),
 	url: urlSchema,
@@ -78,6 +83,10 @@ const httpSchema = baseSchema.extend({
 	jsonPath: z.string().optional().register(monitorStepRegistry, { step: 2 }),
 	customUpCodes: z
 		.array(httpStatusCode)
+		.optional()
+		.register(monitorStepRegistry, { step: 2 }),
+	customHeaders: z
+		.array(httpHeaderSchema)
 		.optional()
 		.register(monitorStepRegistry, { step: 2 }),
 	...geoCheckFields,

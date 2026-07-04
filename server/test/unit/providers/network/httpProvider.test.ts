@@ -494,4 +494,96 @@ describe("HttpProvider", () => {
 			expect(advancedMatcher.validate).not.toHaveBeenCalled();
 		});
 	});
+
+	// ── customHeaders ─────────────────────────────────────────────────────
+
+	describe("customHeaders", () => {
+		it("passes custom headers when customHeaders is set", async () => {
+			mockGot.mockResolvedValue(makeGotResponse());
+			const { provider } = createProvider();
+
+			await provider.handle(makeMonitor({ customHeaders: [{ key: "X-Api-Key", value: "abc123" }] }));
+
+			expect(mockGot).toHaveBeenCalledWith(
+				"https://example.com",
+				expect.objectContaining({
+					headers: { "X-Api-Key": "abc123" },
+				})
+			);
+		});
+
+		it("merges custom headers with Authorization header when both secret and customHeaders are set", async () => {
+			mockGot.mockResolvedValue(makeGotResponse());
+			const { provider } = createProvider();
+
+			await provider.handle(
+				makeMonitor({ secret: "my-token", customHeaders: [{ key: "X-Custom", value: "val" }] })
+			);
+
+			expect(mockGot).toHaveBeenCalledWith(
+				"https://example.com",
+				expect.objectContaining({
+					headers: { Authorization: expect.stringContaining("Bearer "), "X-Custom": "val" },
+				})
+			);
+		});
+
+		it("custom header overrides Authorization when key is Authorization", async () => {
+			mockGot.mockResolvedValue(makeGotResponse());
+			const { provider } = createProvider();
+
+			await provider.handle(
+				makeMonitor({ secret: "ignored-token", customHeaders: [{ key: "Authorization", value: "Token override" }] })
+			);
+
+			expect(mockGot).toHaveBeenCalledWith(
+				"https://example.com",
+				expect.objectContaining({
+					headers: { Authorization: "Token override" },
+				})
+			);
+		});
+
+		it("skips headers with empty keys", async () => {
+			mockGot.mockResolvedValue(makeGotResponse());
+			const { provider } = createProvider();
+
+			await provider.handle(makeMonitor({ customHeaders: [{ key: "", value: "ignored" }] }));
+
+			expect(mockGot).toHaveBeenCalledWith(
+				"https://example.com",
+				expect.objectContaining({
+					headers: undefined,
+				})
+			);
+		});
+
+		it("trims whitespace from header keys", async () => {
+			mockGot.mockResolvedValue(makeGotResponse());
+			const { provider } = createProvider();
+
+			await provider.handle(makeMonitor({ customHeaders: [{ key: "  X-Trimmed  ", value: "val" }] }));
+
+			expect(mockGot).toHaveBeenCalledWith(
+				"https://example.com",
+				expect.objectContaining({
+					headers: { "X-Trimmed": "val" },
+				})
+			);
+		});
+
+		it("passes undefined headers when customHeaders is empty array", async () => {
+			mockGot.mockResolvedValue(makeGotResponse());
+			const { provider } = createProvider();
+
+			await provider.handle(makeMonitor({ customHeaders: [] }));
+
+			expect(mockGot).toHaveBeenCalledWith(
+				"https://example.com",
+				expect.objectContaining({
+					headers: undefined,
+				})
+			);
+		});
+	});
 });

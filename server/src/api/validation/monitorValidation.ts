@@ -13,6 +13,11 @@ import {
 
 const httpStatusCode = z.number().refine((code) => HttpStatusCodeSet.has(code), { message: "Must be a valid HTTP status code" });
 
+const httpHeaderSchema = z.object({
+	key: z.string().min(1, "Header name is required"),
+	value: z.string(),
+});
+
 export const getMonitorByIdParamValidation = z.object({
 	monitorId: z.string().min(1, "Monitor ID is required"),
 });
@@ -117,6 +122,7 @@ export const createMonitorBodyValidation = z
 		geoCheckInterval: z.number().min(300000).optional(),
 		dnsServer: dnsServerValidation.optional(),
 		dnsRecordType: z.enum(DnsRecordTypes).optional(),
+		customHeaders: z.array(httpHeaderSchema).default([]),
 	})
 	.superRefine(refineDnsHostname)
 	.superRefine(refineStrategyType)
@@ -156,6 +162,7 @@ export const editMonitorBodyValidation = z
 		geoCheckInterval: z.number().min(300000).optional(),
 		dnsServer: dnsServerValidation.optional(),
 		dnsRecordType: z.enum(DnsRecordTypes).optional(),
+		customHeaders: z.array(httpHeaderSchema).optional(),
 	})
 	.superRefine(refineDnsHostname)
 	.superRefine(refineStrategyType)
@@ -227,6 +234,7 @@ const importedMonitorSchema = z
 		geoCheckInterval: z.number().min(300000).default(300000),
 		dnsServer: dnsServerValidation.optional(),
 		dnsRecordType: z.enum(DnsRecordTypes).optional(),
+		customHeaders: z.array(httpHeaderSchema).default([]),
 		createdAt: z.string().optional(),
 		updatedAt: z.string().optional(),
 	})
@@ -286,6 +294,7 @@ export const monitorResponseSchema = z
 		geoCheckInterval: z.number(),
 		dnsServer: z.string().optional(),
 		dnsRecordType: z.enum(DnsRecordTypes).optional(),
+		customHeaders: z.array(z.object({ key: z.string(), value: z.string() })).optional(),
 		teamId: z.string(),
 		userId: z.string(),
 		createdAt: z.string(),

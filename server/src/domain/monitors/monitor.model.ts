@@ -1,6 +1,7 @@
 import { Schema, model, Types } from "mongoose";
 import type { Monitor, MonitorMatchMethod, CheckSnapshot } from "@/domain/monitors/monitor.types.js";
 import { DnsRecordTypes, MonitorTypes, MonitorStatuses, PageSpeedStrategies, HttpMethods } from "@/domain/monitors/monitor.types.js";
+import type { HttpHeader } from "@/domain/monitors/monitor.types.js";
 import type {
 	CheckAudits,
 	CheckCaptureInfo,
@@ -200,6 +201,14 @@ const checkSnapshotSchema = new Schema<CheckSnapshotDocument>(
 	{ _id: false, suppressReservedKeysWarning: true }
 );
 
+const httpHeaderSchema = new Schema<HttpHeader>(
+	{
+		key: { type: String, required: true },
+		value: { type: String, required: true },
+	},
+	{ _id: false }
+);
+
 const MonitorSchema = new Schema<MonitorDocument>(
 	{
 		userId: {
@@ -379,6 +388,10 @@ const MonitorSchema = new Schema<MonitorDocument>(
 		dnsRecordType: {
 			type: String,
 			enum: DnsRecordTypes,
+		},
+		customHeaders: {
+			type: [httpHeaderSchema],
+			default: [],
 		},
 		recentChecks: {
 			type: [checkSnapshotSchema],

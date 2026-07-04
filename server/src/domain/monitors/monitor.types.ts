@@ -65,6 +65,11 @@ export type DnsRecordType = (typeof DnsRecordTypes)[number];
 export const HttpMethods = ["GET", "HEAD"] as const;
 export type HttpMethod = (typeof HttpMethods)[number];
 
+export interface HttpHeader {
+	key: string;
+	value: string;
+}
+
 export const MAX_RECENT_CHECKS = 50;
 
 export interface Monitor {
@@ -111,6 +116,7 @@ export interface Monitor {
 	geoCheckInterval?: number;
 	dnsServer?: string;
 	dnsRecordType?: DnsRecordType;
+	customHeaders?: HttpHeader[];
 	recentChecks: CheckSnapshot[];
 	createdAt: string;
 	updatedAt: string;
