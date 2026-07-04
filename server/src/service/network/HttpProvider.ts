@@ -162,8 +162,19 @@ export class HttpProvider implements IStatusProvider<HttpStatusPayload> {
 			throw new Error("URL is required for HTTP monitor");
 		}
 
+		const authHeader: Record<string, string> = secret ? { Authorization: `Bearer ${secret}` } : {};
+		const customHeadersObj: Record<string, string> = {};
+		if (monitor.customHeaders && monitor.customHeaders.length > 0) {
+			for (const { key, value } of monitor.customHeaders) {
+				if (key.trim()) {
+					customHeadersObj[key.trim()] = value;
+				}
+			}
+		}
+		const mergedHeaders = { ...authHeader, ...customHeadersObj };
+
 		const options: Record<string, unknown> = {
-			headers: monitor.secret ? { Authorization: `Bearer ${secret}` } : undefined,
+			headers: Object.keys(mergedHeaders).length > 0 ? mergedHeaders : undefined,
 		};
 
 		options.agent = {

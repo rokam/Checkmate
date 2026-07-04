@@ -15,7 +15,7 @@ import Typography from "@mui/material/Typography";
 import Link from "@mui/material/Link";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import { Trash2 } from "lucide-react";
+import { Trash2, Plus } from "lucide-react";
 import { HeaderDeleteControls } from "@/Components/monitors";
 import { GeoContinents } from "@/Types/GeoCheck";
 
@@ -43,6 +43,7 @@ import {
 	type MonitorType,
 	type GamesMap,
 	type HttpMethod,
+	type HttpHeader,
 	supportsGeoCheck,
 	DefaultPageSpeedStrategy,
 	DefaultHttpMethod,
@@ -1317,6 +1318,82 @@ const CreateMonitorPage = () => {
 								</Stack>
 							)}
 						</Stack>
+					}
+				/>
+			)}
+
+			{showStep(2) && watchedType === "http" && (
+				<ConfigBox
+					title={t("pages.createMonitor.form.customHeaders.title")}
+					subtitle={t("pages.createMonitor.form.customHeaders.description")}
+					rightContent={
+						<Controller
+							name="customHeaders"
+							control={control}
+							render={({ field }) => {
+								const customHeaders: HttpHeader[] = field.value ?? [];
+								return (
+									<Stack spacing={theme.spacing(LAYOUT.MD)}>
+										{customHeaders.map((header, index) => (
+											<Stack
+												key={index}
+												direction="row"
+												alignItems="center"
+												spacing={theme.spacing(SPACING.MD)}
+											>
+												<TextField
+													value={header.key}
+													placeholder={t(
+														"pages.createMonitor.form.customHeaders.option.keyPlaceholder"
+													)}
+													onChange={(e) => {
+														const updated = customHeaders.map((h, i) =>
+															i === index ? { ...h, key: e.target.value } : h
+														);
+														field.onChange(updated);
+													}}
+													fullWidth
+												/>
+												<TextField
+													value={header.value}
+													placeholder={t(
+														"pages.createMonitor.form.customHeaders.option.valuePlaceholder"
+													)}
+													onChange={(e) => {
+														const updated = customHeaders.map((h, i) =>
+															i === index ? { ...h, value: e.target.value } : h
+														);
+														field.onChange(updated);
+													}}
+													fullWidth
+												/>
+												<IconButton
+													size="small"
+													onClick={() => {
+														field.onChange(customHeaders.filter((_, i) => i !== index));
+													}}
+													aria-label={t(
+														"pages.createMonitor.form.customHeaders.option.removeAriaLabel"
+													)}
+												>
+													<Trash2 size={16} />
+												</IconButton>
+											</Stack>
+										))}
+										<Button
+											variant="outlined"
+											color="secondary"
+											startIcon={<Plus size={16} />}
+											onClick={() => {
+												field.onChange([...customHeaders, { key: "", value: "" }]);
+											}}
+										>
+											{t("pages.createMonitor.form.customHeaders.option.addHeader")}
+										</Button>
+									</Stack>
+								);
+							}}
+						/>
 					}
 				/>
 			)}
